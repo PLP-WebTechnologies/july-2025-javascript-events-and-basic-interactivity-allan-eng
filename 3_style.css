@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Validation with JavaScript</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            width: 90%;
+            max-width: 600px;
+            padding: 30px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2.2rem;
+        }
+
+        .description {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #444;
+        }
+
+        .input-with-icon {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+        }
+
+        input {
+            width: 100%;
+            padding: 15px 15px 15px 45px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            border-color: #4c6ef5;
+            outline: none;
+        }
+
+        .error-message {
+            color: #e74c3c;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .success-message {
+            color: #27ae60;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .validation-rules {
+            background-color: #f8f9fa;
+            border-left: 4px solid #4c6ef5;
+            padding: 15px;
+            margin-top: 10px;
+            border-radius: 4px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .validation-rules ul {
+            list-style-type: none;
+            margin-top: 5px;
+        }
+
+        .validation-rules li {
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+        }
+
+        .validation-rules i {
+            margin-right: 8px;
+            font-size: 12px;
+        }
+
+        .fa-check {
+            color: #27ae60;
+        }
+
+        .fa-times {
+            color: #e74c3c;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(90deg, #4c6ef5 0%, #3b5bdb 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .success-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-content i {
+            font-size: 60px;
+            color: #27ae60;
+            margin-bottom: 20px;
+        }
+
+        .modal-content h2 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .modal-content p {
+            color: #666;
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+
+        #close-modal {
+            background: linear-gradient(90deg, #4c6ef5 0%, #3b5bdb 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        #close-modal:hover {
+            transform: scale(1.05);
+        }
+
+        .input-error {
+            border-color: #e74c3c;
+        }
+
+        .input-success {
+            border-color: #27ae60;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #999;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            input {
+                padding: 12px 12px 12px 40px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Create Your Account</h1>
+        <p class="description">Join our community by filling out the form below</p>
+        
+        <form id="registration-form">
+            <div class="form-group">
+                <label for="name">Full Name</label>
+                <div class="input-with-icon">
+                    <i class="input-icon fas fa-user"></i>
+                    <input type="text" id="name" placeholder="Enter your full name">
+                </div>
+                <div class="error-message" id="name-error">Please enter your full name (min 2 characters)</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <div class="input-with-icon">
+                    <i class="input-icon fas fa-envelope"></i>
+                    <input type="email" id="email" placeholder="Enter your email address">
+                </div>
+                <div class="error-message" id="email-error">Please enter a valid email address</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <div class="input-with-icon">
+                    <i class="input-icon fas fa-phone"></i>
+                    <input type="tel" id="phone" placeholder="Enter your phone number">
+                </div>
+                <div class="error-message" id="phone-error">Please enter a valid 10-digit phone number</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password</label>
+                <div class="input-with-icon">
+                    <i class="input-icon fas fa-lock"></i>
+                    <input type="password" id="password" placeholder="Create a strong password">
+                    <i class="password-toggle fas fa-eye" id="password-toggle"></i>
+                </div>
+                <div class="validation-rules" id="password-rules">
+                    <strong>Password must contain:</strong>
+                    <ul>
+                        <li id="length-rule"><i class="fas fa-times"></i> At least 8 characters</li>
+                        <li id="uppercase-rule"><i class="fas fa-times"></i> One uppercase letter</li>
+                        <li id="lowercase-rule"><i class="fas fa-times"></i> One lowercase letter</li>
+                        <li id="number-rule"><i class="fas fa-times"></i> One number</li>
+                        <li id="special-rule"><i class="fas fa-times"></i> One special character</li>
+                    </ul>
+                </div>
+                <div class="error-message" id="password-error">Please create a stronger password</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="confirm-password">Confirm Password</label>
+                <div class="input-with-icon">
+                    <i class="input-icon fas fa-lock"></i>
+                    <input type="password" id="confirm-password" placeholder="Confirm your password">
+                </div>
+                <div class="error-message" id="confirm-password-error">Passwords do not match</div>
+            </div>
+            
+            <button type="submit" id="submit-btn">Create Account</button>
+        </form>
+    </div>
+    
+    <div class="success-modal" id="success-modal">
+        <div class="modal-content">
+            <i class="fas fa-check-circle"></i>
+            <h2>Registration Successful!</h2>
+            <p>Thank you for creating an account. A verification email has been sent to your inbox.</p>
+            <button id="close-modal">Continue</button>
+        </div>
+    </div>
+
+   

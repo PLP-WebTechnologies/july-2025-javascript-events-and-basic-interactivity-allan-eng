@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Validation with JavaScript</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            width: 90%;
+            max-width: 600px;
+            padding: 30px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2.2rem;
+        }
+
+        .description {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #444;
+        }
+
+        .input-with-icon {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+        }
+
+        input {
+            width: 100%;
+            padding: 15px 15px 15px 45px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            border-color: #4c6ef5;
+            outline: none;
+        }
+
+        .error-message {
+            color: #e74c3c;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .success-message {
+            color: #27ae60;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .validation-rules {
+            background-color: #f8f9fa;
+            border-left: 4px solid #4c6ef5;
+            padding: 15px;
+            margin-top: 10px;
+            border-radius: 4px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .validation-rules ul {
+            list-style-type: none;
+            margin-top: 5px;
+        }
+
+        .validation-rules li {
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+        }
+
+        .validation-rules i {
+            margin-right: 8px;
+            font-size: 12px;
+        }
+
+        .fa-check {
+            color: #27ae60;
+        }
+
+        .fa-times {
+            color: #e74c3c;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(90deg, #4c6ef5 0%, #3b5bdb 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .success-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-content i {
+            font-size: 60px;
+            color: #27ae60;
+            margin-bottom: 20px;
+        }
+
+        .modal-content h2 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .modal-content p {
+            color: #666;
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+
+        #close-modal {
+            background: linear-gradient(90deg, #4c6ef5 0%, #3b5bdb 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        #close-modal:hover {
+            transform: scale(1.05);
+        }
+
+        .input-error {
+            border-color: #e74c3c;
+        }
+
+        .input-success {
+            border-color: #27ae60;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #999;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            input {
+                padding: 12px 12px 12px 40px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Create Your Account</h1>
+        <p class="description">Join our community by filling out the form below</p>
+        
+        <form id="registration-form">
+            <div class="form-group">
+                <label for="name">Full Name</label>
+                <div class="input-with-icon">
+                    <i class="input-icon fas fa-user"></i>
+                    <input type="text" id="name" placeholder="Enter your full name">
+                </div>
+                <div class="error-message" id="name-error">Please enter your full name (min 2 characters)</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <div class="input-with-icon">
+                    <i class="input-icon fas fa-envelope"></i>
+                    <input type="email" id="email" placeholder="Enter your email address">
+                </div>
+                <div class="error-message" id="email-error">Please enter a valid email address</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <div class="input-with-icon">
+                    <i class="input-icon fas fa-phone"></i>
+                    <input type="tel" id="phone" placeholder="Enter your phone number">
+                </div>
+                <div class="error-message" id="phone-error">Please enter a valid 10-digit phone number</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password</label>
+                <div class="input-with-icon">
+                    <i class="input-icon fas fa-lock"></i>
+                    <input type="password" id="password" placeholder="Create a strong password">
+                    <i class="password-toggle fas fa-eye" id="password-toggle"></i>
+                </div>
+                <div class="validation-rules" id="password-rules">
+                    <strong>Password must contain:</strong>
+                    <ul>
+                        <li id="length-rule"><i class="fas fa-times"></i> At least 8 characters</li>
+                        <li id="uppercase-rule"><i class="fas fa-times"></i> One uppercase letter</li>
+                        <li id="lowercase-rule"><i class="fas fa-times"></i> One lowercase letter</li>
+                        <li id="number-rule"><i class="fas fa-times"></i> One number</li>
+                        <li id="special-rule"><i class="fas fa-times"></i> One special character</li>
+                    </ul>
+                </div>
+                <div class="error-message" id="password-error">Please create a stronger password</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="confirm-password">Confirm Password</label>
+                <div class="input-with-icon">
+                    <i class="input-icon fas fa-lock"></i>
+                    <input type="password" id="confirm-password" placeholder="Confirm your password">
+                </div>
+                <div class="error-message" id="confirm-password-error">Passwords do not match</div>
+            </div>
+            
+            <button type="submit" id="submit-btn">Create Account</button>
+        </form>
+    </div>
+    
+    <div class="success-modal" id="success-modal">
+        <div class="modal-content">
+            <i class="fas fa-check-circle"></i>
+            <h2>Registration Successful!</h2>
+            <p>Thank you for creating an account. A verification email has been sent to your inbox.</p>
+            <button id="close-modal">Continue</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get form elements
+            const form = document.getElementById('registration-form');
+            const nameInput = document.getElementById('name');
+            const emailInput = document.getElementById('email');
+            const phoneInput = document.getElementById('phone');
+            const passwordInput = document.getElementById('password');
+            const confirmPasswordInput = document.getElementById('confirm-password');
+            const passwordToggle = document.getElementById('password-toggle');
+            const successModal = document.getElementById('success-modal');
+            
+            // Regular expressions for validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            const phoneRegex = /^\d{10}$/;
+            const passwordRegex = {
+                length: /.{8,}/,
+                uppercase: /[A-Z]/,
+                lowercase: /[a-z]/,
+                number: /[0-9]/,
+                special: /[^A-Za-z0-9]/
+            };
+            
+            // Show/hide password functionality
+            passwordToggle.addEventListener('click', function() {
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text';
+                    passwordToggle.classList.remove('fa-eye');
+                    passwordToggle.classList.add('fa-eye-slash');
+                } else {
+                    passwordInput.type = 'password';
+                    passwordToggle.classList.remove('fa-eye-slash');
+                    passwordToggle.classList.add('fa-eye');
+                }
+            });
+            
+            // Real-time validation for name
+            nameInput.addEventListener('blur', function() {
+                validateName();
+            });
+            
+            // Real-time validation for email
+            emailInput.addEventListener('blur', function() {
+                validateEmail();
+            });
+            
+            // Real-time validation for phone
+            phoneInput.addEventListener('blur', function() {
+                validatePhone();
+            });
+            
+            // Real-time validation for password
+            passwordInput.addEventListener('focus', function() {
+                document.getElementById('password-rules').style.display = 'block';
+            });
+            
+            passwordInput.addEventListener('blur', function() {
+                validatePassword();
+            });
+            
+            passwordInput.addEventListener('input', function() {
+                validatePasswordStrength();
+            });
+            
+            // Real-time validation for confirm password
+            confirmPasswordInput.addEventListener('blur', function() {
+                validateConfirmPassword();
+            });
+            
+            // Form submission handler
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Validate all fields
+                const isNameValid = validateName();
+                const isEmailValid = validateEmail();
+                const isPhoneValid = validatePhone();
+                const isPasswordValid = validatePassword();
+                const isConfirmPasswordValid = validateConfirmPassword();
+                
+                // If all fields are valid, show success modal
+                if (isNameValid && isEmailValid && isPhoneValid && 
+                    isPasswordValid && isConfirmPasswordValid) {
+                    successModal.style.display = 'flex';
+                }
+            });
+            
+            // Close modal handler
+            document.getElementById('close-modal').addEventListener('click', function() {
+                successModal.style.display = 'none';
+            });
+            
+            // Validation functions
+            function validateName() {
+                const nameError = document.getElementById('name-error');
+                if (nameInput.value.trim().length < 2) {
+                    showError(nameInput, nameError);
+                    return false;
+                } else {
+                    showSuccess(nameInput);
+                    hideError(nameError);
+                    return true;
+                }
+            }
+            
+            function validateEmail() {
+                const emailError = document.getElementById('email-error');
+                if (!emailRegex.test(emailInput.value)) {
+                    showError(emailInput, emailError);
+                    return false;
+                } else {
+                    showSuccess(emailInput);
+                    hideError(emailError);
+                    return true;
+                }
+            }
+            
+            function validatePhone() {
+                const phoneError = document.getElementById('phone-error');
+                if (!phoneRegex.test(phoneInput.value)) {
+                    showError(phoneInput, phoneError);
+                    return false;
+                } else {
+                    showSuccess(phoneInput);
+                    hideError(phoneError);
+                    return true;
+                }
+            }
+            
+            function validatePassword() {
+                const passwordError = document.getElementById('password-error');
+                let isValid = true;
+                
+                for (const rule in passwordRegex) {
+                    if (!passwordRegex[rule].test(passwordInput.value)) {
+                        isValid = false;
+                        break;
+                    }
+                }
+                
+                if (!isValid) {
+                    showError(passwordInput, passwordError);
+                    return false;
+                } else {
+                    showSuccess(passwordInput);
+                    hideError(passwordError);
+                    return true;
+                }
+            }
+            
+            function validatePasswordStrength() {
+                const rules = {
+                    length: document.getElementById('length-rule'),
+                    uppercase: document.getElementById('uppercase-rule'),
+                    lowercase: document.getElementById('lowercase-rule'),
+                    number: document.getElementById('number-rule'),
+                    special: document.getElementById('special-rule')
+                };
+                
+                for (const rule in passwordRegex) {
+                    const icon = rules[rule].querySelector('i');
+                    if (passwordRegex[rule].test(passwordInput.value)) {
+                        icon.classList.remove('fa-times');
+                        icon.classList.add('fa-check');
+                    } else {
+                        icon.classList.remove('fa-check');
+                        icon.classList.add('fa-times');
+                    }
+                }
+            }
+            
+            function validateConfirmPassword() {
+                const confirmPasswordError = document.getElementById('confirm-password-error');
+                if (confirmPasswordInput.value !== passwordInput.value) {
+                    showError(confirmPasswordInput, confirmPasswordError);
+                    return false;
+                } else {
+                    showSuccess(confirmPasswordInput);
+                    hideError(confirmPasswordError);
+                    return true;
+                }
+            }
+            
+            // Helper functions for UI feedback
+            function showError(input, errorElement) {
+                input.classList.add('input-error');
+                input.classList.remove('input-success');
+                errorElement.style.display = 'block';
+            }
+            
+            function showSuccess(input) {
+                input.classList.remove('input-error');
+                input.classList.add('input-success');
+            }
+            
+            function hideError(errorElement) {
+                errorElement.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
